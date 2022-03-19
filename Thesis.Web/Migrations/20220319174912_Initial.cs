@@ -28,7 +28,9 @@ namespace Thesis.Web.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     DisplayName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    StudentEnrollmentId = table.Column<string>(type: "nvarchar(8)", maxLength: 8, nullable: false),
                     DateOfBirth = table.Column<DateTime>(type: "date", nullable: false),
+                    Gender = table.Column<int>(type: "int", nullable: false),
                     IsAdminUser = table.Column<bool>(type: "bit", nullable: false),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -170,39 +172,17 @@ namespace Thesis.Web.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Students",
-                columns: table => new
-                {
-                    StudentId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    StudentParentName = table.Column<string>(type: "nvarchar(25)", maxLength: 25, nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Students", x => x.StudentId);
-                    table.ForeignKey(
-                        name: "FK_Students_AspNetUsers_StudentId",
-                        column: x => x.StudentId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Faculties",
                 columns: table => new
                 {
-                    FacultyId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    FacultyId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    FacultyName = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
                     SubjectId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Faculties", x => x.FacultyId);
-                    table.ForeignKey(
-                        name: "FK_Faculties_AspNetUsers_FacultyId",
-                        column: x => x.FacultyId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
                     table.ForeignKey(
                         name: "FK_Faculties_Subjects_SubjectId",
                         column: x => x.SubjectId,
@@ -222,23 +202,24 @@ namespace Thesis.Web.Migrations
                     StartDate = table.Column<DateTime>(type: "date", nullable: false),
                     EndDate = table.Column<DateTime>(type: "date", nullable: false),
                     SubjectId = table.Column<int>(type: "int", nullable: false),
-                    StudentId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    FacultyId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    FacultyId = table.Column<int>(type: "int", nullable: false),
+                    MyIdentityUserId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    SubmissionDetailSubmissionId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Projects", x => x.ProjectId);
                     table.ForeignKey(
+                        name: "FK_Projects_AspNetUsers_MyIdentityUserId",
+                        column: x => x.MyIdentityUserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
                         name: "FK_Projects_Faculties_FacultyId",
                         column: x => x.FacultyId,
                         principalTable: "Faculties",
                         principalColumn: "FacultyId",
-                        onDelete: ReferentialAction.NoAction);
-                    table.ForeignKey(
-                        name: "FK_Projects_Students_StudentId",
-                        column: x => x.StudentId,
-                        principalTable: "Students",
-                        principalColumn: "StudentId",
                         onDelete: ReferentialAction.NoAction);
                     table.ForeignKey(
                         name: "FK_Projects_Subjects_SubjectId",
@@ -254,6 +235,7 @@ namespace Thesis.Web.Migrations
                 {
                     SubmissionId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ProjectId = table.Column<int>(type: "int", nullable: false),
                     SubmissionDescription = table.Column<string>(type: "nvarchar(60)", maxLength: 60, nullable: false),
                     SubmissionDueDate = table.Column<DateTime>(type: "date", nullable: false),
@@ -262,6 +244,12 @@ namespace Thesis.Web.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_SubmissionDetails", x => x.SubmissionId);
+                    table.ForeignKey(
+                        name: "FK_SubmissionDetails_AspNetUsers_Id",
+                        column: x => x.Id,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.NoAction);
                     table.ForeignKey(
                         name: "FK_SubmissionDetails_Projects_ProjectId",
                         column: x => x.ProjectId,
@@ -317,14 +305,12 @@ namespace Thesis.Web.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_Projects_FacultyId",
                 table: "Projects",
-                column: "FacultyId",
-                unique: true);
+                column: "FacultyId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Projects_StudentId",
+                name: "IX_Projects_MyIdentityUserId",
                 table: "Projects",
-                column: "StudentId",
-                unique: true);
+                column: "MyIdentityUserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Projects_SubjectId",
@@ -332,13 +318,55 @@ namespace Thesis.Web.Migrations
                 column: "SubjectId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Projects_SubmissionDetailSubmissionId",
+                table: "Projects",
+                column: "SubmissionDetailSubmissionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SubmissionDetails_Id",
+                table: "SubmissionDetails",
+                column: "Id");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_SubmissionDetails_ProjectId",
                 table: "SubmissionDetails",
                 column: "ProjectId");
+
+            migrationBuilder.AddForeignKey(
+                name: "FK_Projects_SubmissionDetails_SubmissionDetailSubmissionId",
+                table: "Projects",
+                column: "SubmissionDetailSubmissionId",
+                principalTable: "SubmissionDetails",
+                principalColumn: "SubmissionId",
+                onDelete: ReferentialAction.Restrict);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropForeignKey(
+                name: "FK_Projects_AspNetUsers_MyIdentityUserId",
+                table: "Projects");
+
+            migrationBuilder.DropForeignKey(
+                name: "FK_SubmissionDetails_AspNetUsers_Id",
+                table: "SubmissionDetails");
+
+            migrationBuilder.DropForeignKey(
+                name: "FK_Faculties_Subjects_SubjectId",
+                table: "Faculties");
+
+            migrationBuilder.DropForeignKey(
+                name: "FK_Projects_Subjects_SubjectId",
+                table: "Projects");
+
+            migrationBuilder.DropForeignKey(
+                name: "FK_Projects_Faculties_FacultyId",
+                table: "Projects");
+
+            migrationBuilder.DropForeignKey(
+                name: "FK_Projects_SubmissionDetails_SubmissionDetailSubmissionId",
+                table: "Projects");
+
             migrationBuilder.DropTable(
                 name: "AspNetRoleClaims");
 
@@ -355,25 +383,22 @@ namespace Thesis.Web.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "SubmissionDetails");
-
-            migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
-                name: "Projects");
-
-            migrationBuilder.DropTable(
-                name: "Faculties");
-
-            migrationBuilder.DropTable(
-                name: "Students");
+                name: "AspNetUsers");
 
             migrationBuilder.DropTable(
                 name: "Subjects");
 
             migrationBuilder.DropTable(
-                name: "AspNetUsers");
+                name: "Faculties");
+
+            migrationBuilder.DropTable(
+                name: "SubmissionDetails");
+
+            migrationBuilder.DropTable(
+                name: "Projects");
         }
     }
 }

@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using Thesis.Web.Models;
+using Thesis.Web.ViewModels;
 
 namespace Thesis.Web.Data
 {
@@ -13,5 +14,9 @@ namespace Thesis.Web.Data
             : base(options)
         {
         }
+        public DbSet<Thesis.Web.Models.SubmissionDetail> SubmissionDetail { get; set; }
+        public DbSet<Thesis.Web.Models.Project> Project { get; set; }
+        public DbSet<Thesis.Web.Models.Subject> Subject { get; set; }
+        public DbSet<Thesis.Web.Models.Faculty> Faculty { get; set; }
     }
 }

@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Thesis.Web.Data;
 using Thesis.Web.Models;
+using Thesis.Web.Models.Enums;
 
 namespace Thesis.Web.Areas.Identity.Pages.Account.Manage
 {
@@ -14,13 +16,16 @@ namespace Thesis.Web.Areas.Identity.Pages.Account.Manage
     {
         private readonly UserManager<MyIdentityUser> _userManager;
         private readonly SignInManager<MyIdentityUser> _signInManager;
+        private readonly ApplicationDbContext _dbContext;
 
         public IndexModel(
             UserManager<MyIdentityUser> userManager,
-            SignInManager<MyIdentityUser> signInManager)
+            SignInManager<MyIdentityUser> signInManager,
+            ApplicationDbContext dbContext)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _dbContext = dbContext;
         }
 
         public string Username { get; set; }
@@ -36,7 +41,32 @@ namespace Thesis.Web.Areas.Identity.Pages.Account.Manage
             [Phone]
             [Display(Name = "Phone number")]
             public string PhoneNumber { get; set; }
+
+            #region Additional Properties as defined in MyIdentityUser Model
+
+            [Display(Name = "Display Name")]
+            [Required(ErrorMessage = "{0} cannot be empty.")]
+            [MinLength(2, ErrorMessage = "{0} should have at least {1} characters.")]
+            [StringLength(60, ErrorMessage = "{0} cannot have more than {1} characters.")]
+            public string DisplayName { get; set; }
+
+            [Display(Name = "Date of Birth")]
+            [Required]
+            public DateTime DateOfBirth { get; set; }
+
+            [Display(Name = "Is Admin User?")]
+            [Required]
+            public bool IsAdminUser { get; set; }
+
+            // NOTE: Assign ID for each of the radio buttons,
+            //       as browser needs unique "id", to avoid browser warnings
+            [Required(ErrorMessage = "Please indicate which of these best describes your Gender.")]
+            [Display(Name = "Gender")]
+            public MyIdentityGenders Gender { get; set; }
+
+            #endregion
         }
+    
 
         private async Task LoadAsync(MyIdentityUser user)
         {
@@ -47,7 +77,11 @@ namespace Thesis.Web.Areas.Identity.Pages.Account.Manage
 
             Input = new InputModel
             {
-                PhoneNumber = phoneNumber
+                PhoneNumber = user.PhoneNumber,
+                DisplayName = user.DisplayName,
+                DateOfBirth = user.DateOfBirth,
+                IsAdminUser = user.IsAdminUser,
+                Gender = user.Gender
             };
         }
 
@@ -65,6 +99,33 @@ namespace Thesis.Web.Areas.Identity.Pages.Account.Manage
 
         public async Task<IActionResult> OnPostAsync()
         {
+            //var user = await _userManager.GetUserAsync(User);
+            // if (user == null)
+            // {
+            //     return NotFound($"Unable to load user with ID '{_userManager.GetUserId(User)}'.");
+            // }
+
+            // if (!ModelState.IsValid)
+            // {
+            //     await LoadAsync(user);
+            //     return Page();
+            // }
+
+            // var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
+            // if (Input.PhoneNumber != phoneNumber)
+            // {
+            //     var setPhoneResult = await _userManager.SetPhoneNumberAsync(user, Input.PhoneNumber);
+            //     if (!setPhoneResult.Succeeded)
+            //     {
+            //         StatusMessage = "Unexpected error when trying to set phone number.";
+            //         return RedirectToPage();
+            //     }
+            // }
+
+            // await _signInManager.RefreshSignInAsync(user);
+            // StatusMessage = "Your profile has been updated";
+            // return RedirectToPage();
+
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
             {
@@ -77,19 +138,51 @@ namespace Thesis.Web.Areas.Identity.Pages.Account.Manage
                 return Page();
             }
 
-            var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
-            if (Input.PhoneNumber != phoneNumber)
+            bool hasChangedPhoneNumber = false;
+            if (Input.PhoneNumber != user.PhoneNumber)
             {
                 var setPhoneResult = await _userManager.SetPhoneNumberAsync(user, Input.PhoneNumber);
-                if (!setPhoneResult.Succeeded)
+                if (setPhoneResult.Succeeded)
+                {
+                    hasChangedPhoneNumber = true;
+                }
+                else
                 {
                     StatusMessage = "Unexpected error when trying to set phone number.";
                     return RedirectToPage();
                 }
             }
 
-            await _signInManager.RefreshSignInAsync(user);
-            StatusMessage = "Your profile has been updated";
+            bool hasOtherChanges = false;
+
+            if (Input.DisplayName != user.DisplayName)
+            {
+                user.DisplayName = Input.DisplayName;
+                hasOtherChanges = true;
+            }
+
+            if (Input.DateOfBirth != user.DateOfBirth)
+            {
+                user.DateOfBirth = Input.DateOfBirth;
+                hasOtherChanges = true;
+            }
+
+            if (Input.Gender != user.Gender)
+            {
+                user.Gender = Input.Gender;
+                hasOtherChanges = true;
+            }
+
+            if (hasChangedPhoneNumber || hasOtherChanges)
+            {
+                _dbContext.SaveChanges();
+                this.StatusMessage = "Your profile has been updated successfully!";
+                await _signInManager.RefreshSignInAsync(user);
+            }
+            else
+            {
+                this.StatusMessage = "Error: No changes to update.";
+            }
             return RedirectToPage();
         }
     }

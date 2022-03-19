@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Thesis.Web.Data;
 
 namespace Thesis.Web.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220319174912_Initial")]
+    partial class Initial
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -235,6 +237,7 @@ namespace Thesis.Web.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("StudentEnrollmentId")
+                        .IsRequired()
                         .HasMaxLength(8)
                         .HasColumnType("nvarchar(8)");
 
@@ -361,7 +364,7 @@ namespace Thesis.Web.Migrations
                     b.HasOne("Thesis.Web.Models.MyIdentityRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
                 });
 
@@ -370,7 +373,7 @@ namespace Thesis.Web.Migrations
                     b.HasOne("Thesis.Web.Models.MyIdentityUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
                 });
 
@@ -379,7 +382,7 @@ namespace Thesis.Web.Migrations
                     b.HasOne("Thesis.Web.Models.MyIdentityUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
                 });
 
@@ -388,13 +391,13 @@ namespace Thesis.Web.Migrations
                     b.HasOne("Thesis.Web.Models.MyIdentityRole", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("Thesis.Web.Models.MyIdentityUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
                 });
 
@@ -403,7 +406,7 @@ namespace Thesis.Web.Migrations
                     b.HasOne("Thesis.Web.Models.MyIdentityUser", null)
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
                 });
 
@@ -412,7 +415,7 @@ namespace Thesis.Web.Migrations
                     b.HasOne("Thesis.Web.Models.Subject", "Subject")
                         .WithMany("Faculties")
                         .HasForeignKey("SubjectId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Subject");
@@ -423,7 +426,7 @@ namespace Thesis.Web.Migrations
                     b.HasOne("Thesis.Web.Models.Faculty", "Faculty")
                         .WithMany("Projects")
                         .HasForeignKey("FacultyId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("Thesis.Web.Models.MyIdentityUser", null)
@@ -433,7 +436,7 @@ namespace Thesis.Web.Migrations
                     b.HasOne("Thesis.Web.Models.Subject", "Subject")
                         .WithMany("Projects")
                         .HasForeignKey("SubjectId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("Thesis.Web.Models.SubmissionDetail", null)
@@ -450,13 +453,13 @@ namespace Thesis.Web.Migrations
                     b.HasOne("Thesis.Web.Models.MyIdentityUser", "User")
                         .WithMany()
                         .HasForeignKey("Id")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("Thesis.Web.Models.Project", "Project")
                         .WithMany()
                         .HasForeignKey("ProjectId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Project");

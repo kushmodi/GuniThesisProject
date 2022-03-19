@@ -1,12 +1,18 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 using System;
+using System.Collections.Generic;
 
 namespace Thesis.Web.Models
 {
     [Table("SubmissionDetails")]
     public class SubmissionDetail
     {
+        [Display(Name = "Student Id")]
+        [ForeignKey(nameof(SubmissionDetail.User))]      // foreign key to the object in the current model.
+        public Guid Id { get; set; }           // User Id of the Project
+        public MyIdentityUser User { get; set; }
+
         [Display(Name = "Submission ID")]
         [Key]
         public int SubmissionId { get; set; }
@@ -32,10 +38,15 @@ namespace Thesis.Web.Models
         public DateTime SubmissionDueDate { get; set; }
 
 
-        [Display(Name = "Submittion Date")]
+        [Display(Name = "Submission Date")]
         [Column(TypeName = "date")]
         [Required]
         public DateTime SubmissionDate { get; set; }
+
+
+        #region Navigation Properties to the Project Model
+        public ICollection<Project> Projects { get; set; }
+        #endregion
 
         //file pending
 

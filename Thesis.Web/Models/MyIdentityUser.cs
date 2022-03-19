@@ -4,6 +4,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Thesis.Web.Models.Enums;
+
 namespace Thesis.Web.Models
 {
     public class MyIdentityUser : IdentityUser<Guid>
@@ -15,18 +17,23 @@ namespace Thesis.Web.Models
         [StringLength(50, ErrorMessage = "{0} cannot have more than {1} characters")]
         public string DisplayName { get; set; }
 
+        [Display(Name = "Student Enrollment Number")]
+        [StringLength(8, ErrorMessage = "{0} cannot have more than {1} character")]
+        [MinLength(8, ErrorMessage = "{0} should have at least {1} character")]
+        public string StudentEnrollmentId { get; set; }
+
         [Display(Name = "Date Of Birth")]
         [Required]
         [PersonalData]
         [Column(TypeName = "date")]
         public DateTime DateOfBirth { get; set; }
 
-        /*
-        [Required]   //step2
+        
+        [Required]   
         [Display(Name = "Gender")]
         [PersonalData]
         public MyIdentityGenders Gender { get; set; }  // enum to be created
-        */
+        
         //role type :
 
         [Display(Name = "Is Admin User")]
@@ -39,8 +46,7 @@ namespace Thesis.Web.Models
         public ICollection<Student> Students { get; set; }
         */
 
-        public Student Student { get; set; }
-        public Faculty Faculty { get; set; }
+        public ICollection<Project> Projects { get; set; }
 
 
         #endregion
