@@ -18,10 +18,10 @@
         @if (await _userManager.IsInRoleAsync(user, MyIdentityRoleNames.Administrator.ToString()))
         {
             <li>
-                <a  asp-controller="Users" asp-action="Index">Students</a>
+                <a  asp-controller="Users" asp-action="Index" class="btn btn-primary btn active" role="button" aria-pressed="true">Students</a><br>
             </li>
             <li>
-                <a  asp-controller="SubmissionDetails" asp-action="Index">SubmissionDetails</a>
+                <a  asp-controller="SubmissionDetails" asp-action="Index" class="btn btn-primary btn active" role="button" aria-pressed="true">SubmissionDetails</a><br>
             </li>
         }
 
@@ -29,12 +29,12 @@
              || await _userManager.IsInRoleAsync(user, MyIdentityRoleNames.Faculty.ToString()))
         {
             <li>
-                <a  asp-controller="Faculties" asp-action="Index">Faculty</a>
+                @*<a  asp-controller="Faculties" asp-action="Index">Faculty</a>*@
+                <a asp-controller="Faculties" asp-action="Index" class="btn btn-primary btn active" role="button" aria-pressed="true">Faculty</a><br>
             </li>
         }
-
         <li>
-            <form class="form-inline"
+           <form class="form-inline"
               asp-area="Identity" asp-page="/Account/Logout"
               method="post">
                 <button type="submit" class="nav-link btn btn-primary">Logout</button>
@@ -44,10 +44,10 @@
     else
     {
         <li>
-            <a asp-area="Identity" asp-page="/Account/Register">Register</a>
+            <a asp-area="Identity" asp-page="/Account/Register" class="btn btn-primary btn active" role="button" aria-pressed="true">Register</a>
         </li>
         <li>
-            <a asp-area="Identity" asp-page="/Account/Login">Login</a>
+            <a asp-area="Identity" asp-page="/Account/Login" class="btn btn-primary btn active" role="button" aria-pressed="true">Login</a>
         </li>
     }
     </ul>

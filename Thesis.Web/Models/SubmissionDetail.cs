@@ -2,6 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Http;
 
 namespace Thesis.Web.Models
 {
@@ -32,6 +33,13 @@ namespace Thesis.Web.Models
         public string SubmissionDescription { get; set; }
 
 
+        public string SubmissionFilePath { get; set; }
+        [NotMapped]
+
+        public IFormFile SubmissionFile { get; set; }
+
+
+
         [Display(Name = "Submission Due Date")]
         [Column(TypeName = "date")]
         [Required]
@@ -42,6 +50,10 @@ namespace Thesis.Web.Models
         [Column(TypeName = "date")]
         [Required]
         public DateTime SubmissionDate { get; set; }
+
+        [Display(Name = "Completion of Project")]
+        public int CompletionPercentage { get; set; }
+        public int status { get; set; } = 0;
 
 
         #region Navigation Properties to the Project Model

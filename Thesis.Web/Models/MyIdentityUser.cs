@@ -48,6 +48,8 @@ namespace Thesis.Web.Models
 
         public ICollection<Project> Projects { get; set; }
 
+        public ICollection<SubmissionDetail> SubmissionDetails { get; set; }
+
 
         #endregion
 

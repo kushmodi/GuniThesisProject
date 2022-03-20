@@ -4,11 +4,19 @@
     ViewData["Title"] = "Index";
 }
 
-<h1>Index</h1>
+<div class="page-title-area item-bg1">
+		<div class="d-table">
+			<div class="d-table-cell">
+				<div class="container">
+					<div class="page-title-content">
+						<h1 style="color:white">Index Submission Detials</h1>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+<hr />
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
 <table class="table">
     <thead>
         <tr>
@@ -16,21 +24,18 @@
                 @Html.DisplayNameFor(model => model.User)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Project)
-            </th>
-            <th>
                 @Html.DisplayNameFor(model => model.SubmissionDescription)
             </th>
-             <th>
+            <th>
                 @Html.DisplayNameFor(model => model.SubmissionFilePath)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.SubmissionDueDate)
+                StartDate
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.SubmissionDate)
+                EndDate
             </th>
-            <th></th>
+            <th>Status</th>
         </tr>
     </thead>
     <tbody>
@@ -40,19 +45,16 @@
                 @Html.DisplayFor(modelItem => item.User.DisplayName)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Project.ProjectDescription)
-            </td>
-            <td>
                 @Html.DisplayFor(modelItem => item.SubmissionDescription)
             </td>
-             <td>
-                @Html.DisplayNameFor(model => model.SubmissionFilePath)
-            </td>
             <td>
-                @Html.DisplayFor(modelItem => item.SubmissionDueDate)
+                @Html.DisplayFor(modelItem => item.SubmissionFilePath)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.SubmissionDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.SubmissionDueDate)
             </td>
             <td>
                 @{
@@ -70,12 +72,8 @@
                 }
             }
             </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.SubmissionId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.SubmissionId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.SubmissionId">Delete</a>
-            </td>
         </tr>
 }
     </tbody>
 </table>
+© 2022 GitHub, Inc.

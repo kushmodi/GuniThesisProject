@@ -1,23 +1,30 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 using Thesis.Web.Data;
 using Thesis.Web.Models;
 
 namespace Thesis.Web.Controllers
 {
-    [Authorize(Roles = "Administrator,Faculty,Student")]
     public class SubmissionDetailsController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly IConfiguration _config;
+        private readonly IWebHostEnvironment webHostEnvironment;
 
-        public SubmissionDetailsController(ApplicationDbContext context)
-        {
+        public SubmissionDetailsController(ApplicationDbContext context, IWebHostEnvironment hostEnvironment, IConfiguration config)
+           {
+            _config = config;
+            webHostEnvironment = hostEnvironment;
             _context = context;
         }
 
@@ -25,6 +32,11 @@ namespace Thesis.Web.Controllers
         public async Task<IActionResult> Index()
         {
             var applicationDbContext = _context.SubmissionDetail.Include(s => s.Project).Include(s => s.User);
+            return View(await applicationDbContext.ToListAsync());
+        }
+        public async Task<IActionResult> studentIndex()
+        {
+            var applicationDbContext = _context.SubmissionDetail.Include(s => s.Projects).Include(s => s.ProjectId);
             return View(await applicationDbContext.ToListAsync());
         }
 
@@ -51,8 +63,10 @@ namespace Thesis.Web.Controllers
         // GET: SubmissionDetails/Create
         public IActionResult Create()
         {
+            var temp = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            ViewData["User"] = User.FindFirstValue(ClaimTypes.NameIdentifier).ToUpper();
             ViewData["ProjectId"] = new SelectList(_context.Project, "ProjectId", "ProjectDescription");
-            ViewData["Id"] = new SelectList(_context.Users, "Id", "DisplayName");
+            ViewData["Id"] = new SelectList(_context.Users, "Id", "Id");
             return View();
         }
 
@@ -61,13 +75,24 @@ namespace Thesis.Web.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,SubmissionId,ProjectId,SubmissionDescription,SubmissionDueDate,SubmissionDate")] SubmissionDetail submissionDetail)
+        public async Task<IActionResult> Create([Bind("Id,SubmissionId,ProjectId,SubmissionDescription,CompletionPercentage,SubmissionDueDate,SubmissionDate,SubmissionFile")] SubmissionDetail submissionDetail)
         {
             if (ModelState.IsValid)
             {
+                string wwwRootPath = webHostEnvironment.WebRootPath;
+                string filename = Path.GetFileNameWithoutExtension(submissionDetail.SubmissionFilePath);
+               
+                string fileextention = Path.GetExtension(submissionDetail.SubmissionFile.FileName);
+                string FilePath = filename + DateTime.Now.ToString("yymmssfff") + fileextention;
+                submissionDetail.SubmissionFilePath = filename + DateTime.Now.ToString("yymmssfff") + fileextention;
+                string path = Path.Combine(wwwRootPath, "Document", filename);
+                using (var filestream = new FileStream(path, FileMode.Create))
+                {
+                    await submissionDetail.SubmissionFile.CopyToAsync(filestream);
+                }
                 _context.Add(submissionDetail);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(studentIndex));
             }
             ViewData["ProjectId"] = new SelectList(_context.Project, "ProjectId", "ProjectDescription", submissionDetail.ProjectId);
             ViewData["Id"] = new SelectList(_context.Users, "Id", "DisplayName", submissionDetail.Id);
@@ -88,7 +113,9 @@ namespace Thesis.Web.Controllers
                 return NotFound();
             }
             ViewData["ProjectId"] = new SelectList(_context.Project, "ProjectId", "ProjectDescription", submissionDetail.ProjectId);
-            ViewData["Id"] = new SelectList(_context.Users, "Id", "DisplayName", submissionDetail.Id);
+           var idupper = submissionDetail.Id.ToString();
+            ViewData["Id"] = submissionDetail.Id;
+            ViewData["User"] = User.FindFirstValue(ClaimTypes.NameIdentifier).ToUpper();
             return View(submissionDetail);
         }
 
@@ -97,7 +124,7 @@ namespace Thesis.Web.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,SubmissionId,ProjectId,SubmissionDescription,SubmissionDueDate,SubmissionDate")] SubmissionDetail submissionDetail)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,SubmissionId,ProjectId,SubmissionDescription,SubmissionDueDate,SubmissionDate,SubmissionFilePath")] SubmissionDetail submissionDetail)
         {
             if (id != submissionDetail.SubmissionId)
             {

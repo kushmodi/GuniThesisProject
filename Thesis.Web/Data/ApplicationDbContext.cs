@@ -18,5 +18,10 @@ namespace Thesis.Web.Data
         public DbSet<Thesis.Web.Models.Project> Project { get; set; }
         public DbSet<Thesis.Web.Models.Subject> Subject { get; set; }
         public DbSet<Thesis.Web.Models.Faculty> Faculty { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            base.OnModelCreating(builder);
+        }
     }
 }

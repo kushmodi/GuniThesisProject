@@ -11,7 +11,7 @@ using Thesis.Web.Models;
 
 namespace Thesis.Web.Controllers
 {
-    [Authorize(Roles = "Administrator,Faculty")]
+    [Authorize(Roles = "Administrator,Faculty,Student")]
     public class ProjectsController : Controller
     {
         private readonly ApplicationDbContext _context;

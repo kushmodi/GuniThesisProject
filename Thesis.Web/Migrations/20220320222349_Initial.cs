@@ -28,7 +28,7 @@ namespace Thesis.Web.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     DisplayName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    StudentEnrollmentId = table.Column<string>(type: "nvarchar(8)", maxLength: 8, nullable: false),
+                    StudentEnrollmentId = table.Column<string>(type: "nvarchar(8)", maxLength: 8, nullable: true),
                     DateOfBirth = table.Column<DateTime>(type: "date", nullable: false),
                     Gender = table.Column<int>(type: "int", nullable: false),
                     IsAdminUser = table.Column<bool>(type: "bit", nullable: false),
@@ -238,8 +238,11 @@ namespace Thesis.Web.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ProjectId = table.Column<int>(type: "int", nullable: false),
                     SubmissionDescription = table.Column<string>(type: "nvarchar(60)", maxLength: 60, nullable: false),
+                    SubmissionFilePath = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     SubmissionDueDate = table.Column<DateTime>(type: "date", nullable: false),
-                    SubmissionDate = table.Column<DateTime>(type: "date", nullable: false)
+                    SubmissionDate = table.Column<DateTime>(type: "date", nullable: false),
+                    CompletionPercentage = table.Column<int>(type: "int", nullable: false),
+                    status = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
