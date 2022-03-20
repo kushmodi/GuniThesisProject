@@ -20,14 +20,14 @@ using Thesis.Web.Models.Enums;
 namespace Thesis.Web.Areas.Identity.Pages.Account
 {
     [AllowAnonymous]
-    public class RegisterModel : PageModel
+    public class RegisterFacultyModel : PageModel
     {
         private readonly SignInManager<MyIdentityUser> _signInManager;
         private readonly UserManager<MyIdentityUser> _userManager;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
 
-        public RegisterModel(
+        public RegisterFacultyModel(
             UserManager<MyIdentityUser> userManager,
             SignInManager<MyIdentityUser> signInManager,
             ILogger<RegisterModel> logger,
@@ -65,6 +65,7 @@ namespace Thesis.Web.Areas.Identity.Pages.Account
             public string ConfirmPassword { get; set; }
 
             [Display(Name = "Student Enrollment Number")]
+            [Required]
             [StringLength(8, ErrorMessage = "{0} cannot have more than {1} character")]
             [MinLength(8, ErrorMessage = "{0} should have at least {1} character")]
             public string StudentEnrollmentId { get; set; }

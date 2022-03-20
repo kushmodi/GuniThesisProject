@@ -10,7 +10,7 @@ using Thesis.Web.Data;
 namespace Thesis.Web.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20220319120635_Initial")]
+    [Migration("20220320222349_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -124,8 +124,15 @@ namespace Thesis.Web.Migrations
 
             modelBuilder.Entity("Thesis.Web.Models.Faculty", b =>
                 {
-                    b.Property<Guid>("FacultyId")
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<int>("FacultyId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("FacultyName")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<int>("SubjectId")
                         .HasColumnType("int");
@@ -197,6 +204,9 @@ namespace Thesis.Web.Migrations
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
 
+                    b.Property<int>("Gender")
+                        .HasColumnType("int");
+
                     b.Property<bool>("IsAdminUser")
                         .HasColumnType("bit");
 
@@ -225,6 +235,10 @@ namespace Thesis.Web.Migrations
 
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("StudentEnrollmentId")
+                        .HasMaxLength(8)
+                        .HasColumnType("nvarchar(8)");
 
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("bit");
@@ -256,7 +270,10 @@ namespace Thesis.Web.Migrations
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("date");
 
-                    b.Property<Guid>("FacultyId")
+                    b.Property<int>("FacultyId")
+                        .HasColumnType("int");
+
+                    b.Property<Guid?>("MyIdentityUserId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("ProjectDescription")
@@ -272,37 +289,23 @@ namespace Thesis.Web.Migrations
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("date");
 
-                    b.Property<Guid>("StudentId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<int>("SubjectId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("SubmissionDetailSubmissionId")
                         .HasColumnType("int");
 
                     b.HasKey("ProjectId");
 
-                    b.HasIndex("FacultyId")
-                        .IsUnique();
+                    b.HasIndex("FacultyId");
 
-                    b.HasIndex("StudentId")
-                        .IsUnique();
+                    b.HasIndex("MyIdentityUserId");
 
                     b.HasIndex("SubjectId");
 
+                    b.HasIndex("SubmissionDetailSubmissionId");
+
                     b.ToTable("Projects");
-                });
-
-            modelBuilder.Entity("Thesis.Web.Models.Student", b =>
-                {
-                    b.Property<Guid>("StudentId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("StudentParentName")
-                        .HasMaxLength(25)
-                        .HasColumnType("nvarchar(25)");
-
-                    b.HasKey("StudentId");
-
-                    b.ToTable("Students");
                 });
 
             modelBuilder.Entity("Thesis.Web.Models.Subject", b =>
@@ -329,6 +332,12 @@ namespace Thesis.Web.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<int>("CompletionPercentage")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<int>("ProjectId")
                         .HasColumnType("int");
 
@@ -343,7 +352,15 @@ namespace Thesis.Web.Migrations
                     b.Property<DateTime>("SubmissionDueDate")
                         .HasColumnType("date");
 
+                    b.Property<string>("SubmissionFilePath")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("status")
+                        .HasColumnType("int");
+
                     b.HasKey("SubmissionId");
+
+                    b.HasIndex("Id");
 
                     b.HasIndex("ProjectId");
 
@@ -358,7 +375,6 @@ namespace Thesis.Web.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
                 });
-
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<System.Guid>", b =>
                 {
@@ -404,12 +420,6 @@ namespace Thesis.Web.Migrations
 
             modelBuilder.Entity("Thesis.Web.Models.Faculty", b =>
                 {
-                    b.HasOne("Thesis.Web.Models.MyIdentityUser", "User")
-                        .WithOne("Faculty")
-                        .HasForeignKey("Thesis.Web.Models.Faculty", "FacultyId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
                     b.HasOne("Thesis.Web.Models.Subject", "Subject")
                         .WithMany("Faculties")
                         .HasForeignKey("SubjectId")
@@ -417,23 +427,19 @@ namespace Thesis.Web.Migrations
                         .IsRequired();
 
                     b.Navigation("Subject");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Thesis.Web.Models.Project", b =>
                 {
                     b.HasOne("Thesis.Web.Models.Faculty", "Faculty")
-                        .WithOne("Projects")
-                        .HasForeignKey("Thesis.Web.Models.Project", "FacultyId")
+                        .WithMany("Projects")
+                        .HasForeignKey("FacultyId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.HasOne("Thesis.Web.Models.Student", "Student")
-                        .WithOne("Projects")
-                        .HasForeignKey("Thesis.Web.Models.Project", "StudentId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                    b.HasOne("Thesis.Web.Models.MyIdentityUser", null)
+                        .WithMany("Projects")
+                        .HasForeignKey("MyIdentityUserId");
 
                     b.HasOne("Thesis.Web.Models.Subject", "Subject")
                         .WithMany("Projects")
@@ -441,33 +447,32 @@ namespace Thesis.Web.Migrations
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.Navigation("Faculty");
+                    b.HasOne("Thesis.Web.Models.SubmissionDetail", null)
+                        .WithMany("Projects")
+                        .HasForeignKey("SubmissionDetailSubmissionId");
 
-                    b.Navigation("Student");
+                    b.Navigation("Faculty");
 
                     b.Navigation("Subject");
                 });
 
-            modelBuilder.Entity("Thesis.Web.Models.Student", b =>
+            modelBuilder.Entity("Thesis.Web.Models.SubmissionDetail", b =>
                 {
                     b.HasOne("Thesis.Web.Models.MyIdentityUser", "User")
-                        .WithOne("Student")
-                        .HasForeignKey("Thesis.Web.Models.Student", "StudentId")
+                        .WithMany("SubmissionDetails")
+                        .HasForeignKey("Id")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Thesis.Web.Models.SubmissionDetail", b =>
-                {
                     b.HasOne("Thesis.Web.Models.Project", "Project")
-                        .WithMany("SubmissionDetails")
+                        .WithMany()
                         .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Project");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Thesis.Web.Models.Faculty", b =>
@@ -477,25 +482,20 @@ namespace Thesis.Web.Migrations
 
             modelBuilder.Entity("Thesis.Web.Models.MyIdentityUser", b =>
                 {
-                    b.Navigation("Faculty");
-
-                    b.Navigation("Student");
-                });
-
-            modelBuilder.Entity("Thesis.Web.Models.Project", b =>
-                {
-                    b.Navigation("SubmissionDetails");
-                });
-
-            modelBuilder.Entity("Thesis.Web.Models.Student", b =>
-                {
                     b.Navigation("Projects");
+
+                    b.Navigation("SubmissionDetails");
                 });
 
             modelBuilder.Entity("Thesis.Web.Models.Subject", b =>
                 {
                     b.Navigation("Faculties");
 
+                    b.Navigation("Projects");
+                });
+
+            modelBuilder.Entity("Thesis.Web.Models.SubmissionDetail", b =>
+                {
                     b.Navigation("Projects");
                 });
 #pragma warning restore 612, 618

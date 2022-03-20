@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using System;
 using Thesis.Web.Data;
 using Thesis.Web.Models;
@@ -79,7 +80,12 @@ namespace Thesis.Web
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(
+            IApplicationBuilder app,
+            IWebHostEnvironment env,
+             ILogger<Startup> logger,
+            UserManager<MyIdentityUser> userManager,
+            RoleManager<MyIdentityRole> roleManager)
         {
             if (env.IsDevelopment())
             {
@@ -104,13 +110,21 @@ namespace Thesis.Web
             app.UseEndpoints(endpoints =>
             {
 
+                endpoints.MapRazorPages();
+
+                // Register the Route for Areas
+                endpoints.MapControllerRoute(
+                    name: "areas",
+                    pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
+
+                // Register the Default Route
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{area:exists}/{controller}/{action=Index}/{id?}");
-
-
-                endpoints.MapRazorPages();
+                    pattern: "{controller}/{action=Index}/{id?}");
             });
+
+            ApplicationDbContextSeed.SeedIdentityRolesAsync(roleManager).Wait();
+            ApplicationDbContextSeed.SeedIdentityUserAsync(userManager).Wait();
         }
     }
 }

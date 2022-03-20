@@ -1,0 +1,79 @@
+﻿@model IEnumerable<Thesis.Web.Models.SubmissionDetail>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<div class="page-title-area item-bg1">
+		<div class="d-table">
+			<div class="d-table-cell">
+				<div class="container">
+					<div class="page-title-content">
+						<h1 style="color:white">Index Submission Detials</h1>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+<hr />
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.User)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SubmissionDescription)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SubmissionFilePath)
+            </th>
+            <th>
+                StartDate
+            </th>
+            <th>
+                EndDate
+            </th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.User.DisplayName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.SubmissionDescription)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.SubmissionFilePath)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.SubmissionDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.SubmissionDueDate)
+            </td>
+            <td>
+                @{
+                if(item.status == 0)
+                {
+                    <p>Pending</p>
+                }
+                else if(item.status == 1)
+                {
+                    <p>Reject</p>
+                }
+                else if(item.status == 2)
+                {
+                    <p>Approve</p>
+                }
+            }
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+© 2022 GitHub, Inc.

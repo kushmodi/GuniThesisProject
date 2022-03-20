@@ -49,24 +49,19 @@ namespace Thesis.Web.Models
 
         #region Navigational Properties to the Student Model 
 
-        [Display(Name = "Student ID")]
-        [ForeignKey(nameof(Project.Student))]
-        public Guid StudentId { get; set; }
-        public Student Student { get; set; } //foreign key to StudentId in Students Table
-
         #endregion
 
 
         #region Navigational Properties to the Faculty Model 
         [Display(Name = "Faculty Id")]
+        [Required]
         [ForeignKey(nameof(Project.Faculty))]
-        public Guid FacultyId { get; set; }  //foreign key to FacultyId in Faculty Table
+        public int FacultyId { get; set; }  //foreign key to FacultyId in Faculty Table
         public Faculty Faculty { get; set; }
         #endregion
 
 
         #region Navigational Properties to the Submission Details Model 
-        public ICollection<SubmissionDetail> SubmissionDetails { get; set; }
         #endregion
 
 

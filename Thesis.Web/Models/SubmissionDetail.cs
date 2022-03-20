@@ -1,12 +1,19 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 using System;
+using System.Collections.Generic;
+using Microsoft.AspNetCore.Http;
 
 namespace Thesis.Web.Models
 {
     [Table("SubmissionDetails")]
     public class SubmissionDetail
     {
+        [Display(Name = "Student Id")]
+        [ForeignKey(nameof(SubmissionDetail.User))]      // foreign key to the object in the current model.
+        public Guid Id { get; set; }           // User Id of the Project
+        public MyIdentityUser User { get; set; }
+
         [Display(Name = "Submission ID")]
         [Key]
         public int SubmissionId { get; set; }
@@ -26,16 +33,32 @@ namespace Thesis.Web.Models
         public string SubmissionDescription { get; set; }
 
 
+        public string SubmissionFilePath { get; set; }
+        [NotMapped]
+
+        public IFormFile SubmissionFile { get; set; }
+
+
+
         [Display(Name = "Submission Due Date")]
         [Column(TypeName = "date")]
         [Required]
         public DateTime SubmissionDueDate { get; set; }
 
 
-        [Display(Name = "Submittion Date")]
+        [Display(Name = "Submission Date")]
         [Column(TypeName = "date")]
         [Required]
         public DateTime SubmissionDate { get; set; }
+
+        [Display(Name = "Completion of Project")]
+        public int CompletionPercentage { get; set; }
+        public int status { get; set; } = 0;
+
+
+        #region Navigation Properties to the Project Model
+        public ICollection<Project> Projects { get; set; }
+        #endregion
 
         //file pending
 
